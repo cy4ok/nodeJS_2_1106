@@ -11,6 +11,12 @@
    "product_name": "Mouse",
    "price": 10,
    "quantity": 1
+  },
+  {
+   "id_product": 3,
+   "product_name": "Keyboard",
+   "price": 20,
+   "quantity": 3
   }
  ]
 }

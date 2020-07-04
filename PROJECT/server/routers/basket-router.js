@@ -1,25 +1,13 @@
 let express = require('express');
 let fs = require('fs');
-
-let writer = require('./Utils/writer');
-let logger = require('./Utils/logger');
-let catalogServices = require('./Services/catalog');
-let basketServices = require('./Services/basket');
-
-let server = express();
-server.use(express.json()); //popozje
+let logger = require('../Utils/logger');
+let writer = require('../Utils/writer');
+let basketServices = require('../Services/basket');
 
 
+let router = express.Router();
 
-server.get('/catalog', (req, res) => {
-    fs.readFile('./server/db/catalog.json', 'utf-8', (err, data) => {
-        if (!err) {
-            res.send(data);
-        }
-    })
-});
-
-server.get('/basket', (req, res) => {
+router.get('/', (req, res) => {
     fs.readFile('./server/db/basket.json', 'utf-8', (err, data) => {
         if (!err) {
             res.send(data);
@@ -27,28 +15,10 @@ server.get('/basket', (req, res) => {
     })
 });
 
-
-
-server.post('/catalog', (req, res) => {
-    fs.readFile('./server/db/catalog.json', 'utf-8', (err, data) => {
-        if (!err) {
-            let { newCatalog, idNewItem } = catalogServices.add(JSON.parse(data), req.body);
-            writer('./server/db/catalog.json', newCatalog)
-                .then(status => {
-                    if (status) {
-                        res.json({ id: idNewItem });
-                    } else {
-                        res.sendStatus(500);
-                    }
-                })
-        }
-    });
-});
-
-server.post('/basket/', (req, res) => {
+router.post('/', (req, res) => {
     fs.readFile('./server/db/basket.json', 'utf-8', (err, data) => {
         if (!err) {
-            let { newBasket} = basketServices.add(JSON.parse(data), req.body);
+            let { newBasket } = basketServices.add(JSON.parse(data), req.body);
             writer('./server/db/basket.json', newBasket)
                 .then(status => {
                     if (status) {
@@ -63,7 +33,7 @@ server.post('/basket/', (req, res) => {
     });
 });
 
-server.put('/basket/:id', (req, res) => {
+router.put('/:id', (req, res) => {
     fs.readFile('./server/db/basket.json', 'utf-8', (err, data) => {
         if (!err) {
             let { newBasket, name } = basketServices.change(JSON.parse(data), req.params.id, req.body.amount);
@@ -80,7 +50,7 @@ server.put('/basket/:id', (req, res) => {
     });
 });
 
-server.delete('/basket/:id', (req, res) => {
+router.delete('/:id', (req, res) => {
     fs.readFile('./server/db/basket.json', 'utf-8', (err, data) => {
         if (!err) {
             let { newBasket, name } = basketServices.delete(JSON.parse(data), req.params.id);
@@ -97,6 +67,4 @@ server.delete('/basket/:id', (req, res) => {
     });
 });
 
-server.listen(8080, () => {
-    console.log('Server is running at port 8080')
-});
+module.exports = router;
